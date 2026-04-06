@@ -1,0 +1,71 @@
+# ili-at-scale base configuration
+# Override any key via CLI: python -m ili_at_scale.preprocess model_dir=/my/path
+
+# --- OUTPUT ---
+model_dir: ???  # REQUIRED: path to save all outputs (splits, nets, posteriors)
+
+# --- DEVICE ---
+device: cpu  # cpu or cuda
+net_index: null  # index for parallel net training (set via SLURM array)
+
+# --- LOADER ---
+# These keys are passed to load_data() in loaders.py.
+# Add any dataset-specific keys here and access them as cfg.loader.*
+loader:
+  data_path: null
+  kmin: 0.0
+  kmax: 0.4
+  # Add your own keys here, e.g.:
+  # tracer: galaxy
+  # Nmax: -1
+  # summary: [zPk0, zPk2]
+
+# --- PREPROCESSING ---
+val_frac: 0.1
+test_frac: 0.1
+seed: 0
+pca_features: null  # number of PCA features (null = no PCA)
+
+# --- PRIOR ---
+prior: uniform  # edit priors.py to add custom priors
+
+# --- TRAINING ---
+backend: lampe  # lampe or sbi
+engine: NPE  # NPE, NLE, or NRE
+embedding_net: fcn  # fcn, cnn, mhe, fun, or mhf
+retrain: false
+verbose: false
+
+# Training hyperparameters (null = set by hyperprior / Optuna)
+batch_size: null
+learning_rate: null
+stop_after_epochs: 30
+weight_decay: null
+lr_decay_factor: null
+lr_patience: null
+
+# Validation smoothing
+validation_smoothing_method: ema
+ema_decay: 0.9
+
+# Preprocessing options
+precompress: false
+
+# --- ENSEMBLE ---
+Nnets: 10  # number of top networks to ensemble
+
+# --- OPTUNA ---
+n_trials: 30
+n_startup_trials: 50
+
+# --- CROSS-VALIDATION ---
+cross_val: true
+n_splits: 4
+
+# --- VALIDATION ---
+clean_models: true
+param_names: null  # list of parameter names for plots, e.g. [Omega_m, sigma_8]
+
+testing:
+  path: null  # path to external test data (null = use model_dir)
+  name: null  # name for external test output subdirectory

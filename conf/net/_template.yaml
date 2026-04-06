@@ -1,0 +1,67 @@
+# Network hyperprior template for ili-at-scale
+#
+# This file defines the search space for Optuna hyperparameter optimization.
+# Copy this file, rename it, and adjust the ranges for your use case.
+# Select it via: net=your_config_name
+#
+# VALUE INTERPRETATION:
+#   - A single value (e.g., 0.01) is used as-is (fixed, not searched).
+#   - A list of two numbers (e.g., [0.001, 0.1]) defines a search range.
+#     For 'int' params: uniform integer range [low, high].
+#     For 'float' params: log-uniform range [low, high].
+#   - A list of strings/bools (e.g., [True, False]) is treated as categorical.
+#
+# ARCHITECTURE-SPECIFIC PARAMETERS:
+#   Only the section matching your chosen embedding_net is used.
+#   The others are ignored at runtime.
+
+# --- Fully Connected Network (embedding_net: fcn) ---
+fcn:
+  fcn_depth: [0, 4]       # Number of hidden layers (0 = identity embedding)
+  fcn_width: [16, 64]     # Width of each hidden layer
+
+# --- 1D Convolutional Network (embedding_net: cnn) ---
+cnn:
+  cnn_depth: [2, 6]       # Number of conv layers
+  out_channels: [4, 16]   # Output channels per conv layer
+  kernel_size: [3, 5]     # Kernel size for conv layers
+
+# --- Multi-Head Embedding (embedding_net: mhe) ---
+# Splits input into sub-vectors and embeds each with an MLP.
+# Requires x_startidx.txt from preprocessing to define sub-vector boundaries.
+mhe:
+  hidden_depth: [0, 2]    # Depth of each head's MLP
+  hidden_width: [4, 32]   # Width of each head's MLP hidden layers
+  out_features: [4, 16]   # Output dimension per head
+
+# --- Funnel Network (embedding_net: fun) ---
+# MLP with linearly interpolated hidden dimensions from input to output.
+fun:
+  hidden_depth: [0, 3]    # Number of hidden layers
+  out_features: [4, 16]   # Final output dimension
+  linear_dim: null         # Override input dimension for interpolation (null = use actual input dim)
+  bypass: False            # If True, appends last input feature to output
+
+# --- Multi-Head Funnel (embedding_net: mhf) ---
+# Like mhe but with FunnelNetwork heads instead of MLP heads.
+mhf:
+  hidden_depth: [0, 2]
+  out_features: [4, 16]
+  linear_dim: null
+  bypass: False
+
+# --- Shared hyperparameters (used by all architectures) ---
+shared:
+  model: 'nsf'                        # NDE model type: nsf, maf, mdn, etc.
+  hidden_features: [8, 32]            # Hidden features in the normalizing flow
+  num_transforms: [1, 5]              # Number of flow transforms
+  log2_batch_size: [5, 9]             # Batch size as power of 2 (32 to 512)
+  learning_rate: [5.e-6, 1.e-3]       # Learning rate (log-uniform search)
+  weight_decay: [1.e-5, 1.e-1]        # L2 regularization (log-uniform search)
+  lr_patience: [5, 20]                # Epochs before LR reduction
+  lr_decay_factor: [0.1, 0.9]         # Factor to reduce LR by
+  early_stopping: True                 # Whether to stop early on plateau
+  noise_percent: 0.0                   # Fraction of Gaussian noise added to training data
+  lr_scheduler: 'ReduceLROnPlateau'    # LR scheduler: ReduceLROnPlateau, CosineAnnealingLR
+  max_epochs: 1000                     # Maximum training epochs
+  dropout: 0.0                         # Dropout probability (0 = no dropout)
