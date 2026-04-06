@@ -15,8 +15,8 @@ conda activate cmass
 sleep $SLURM_ARRAY_TASK_ID  # stagger start
 
 # ---- PATHS (edit these) ----
-REPO_DIR=/u/maho3/git/ili-at-scale
-MODEL_DIR=/path/to/output/models
+REPO_DIR=/u/maho3/git/ilias
+MODEL_DIR=/work/hdd/bdne/maho3/temp_models
 
 cd $REPO_DIR
 
@@ -30,4 +30,4 @@ python -m ilias.optuna \
     model_dir=$MODEL_DIR \
     device=cpu \
     embedding_net=fun \
-    net=niall2
+    +net=niall2

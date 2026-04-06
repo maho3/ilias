@@ -12,9 +12,9 @@ source ~/.bashrc
 conda activate cmass
 
 # ---- PATHS (edit these) ----
-REPO_DIR=/u/maho3/git/ili-at-scale
-MODEL_DIR=/path/to/output/models
-DATA_DIR=/path/to/quijote/suite  # parent of 0/, 1/, 2/, ...
+REPO_DIR=/u/maho3/git/ilias
+MODEL_DIR=/work/hdd/bdne/maho3/temp_models
+DATA_DIR=/work/hdd/bdne/maho3/cmass-ili/quijote/nbody/L1000-N128  # parent of 0/, 1/, 2/, ...
 
 cd $REPO_DIR
 
@@ -24,15 +24,11 @@ cd $REPO_DIR
 python -m ilias.preprocess \
     model_dir=$MODEL_DIR \
     device=cpu \
-    val_frac=0 \
-    test_frac=1 \
     +loader.data_path=$DATA_DIR \
     +loader.tracer=galaxy \
-    +loader.Nmax=4000 \
-    +loader.a=0.667 \
+    +loader.a=0.66667 \
+    +loader.Nmax=200 \
     +loader.summary='[nbar,zPk0]' \
-    +loader.kmin=0.0 \
-    +loader.kmax=0.4 \
     +loader.include_hod=False \
     +loader.include_noise=True \
     +loader.correct_shot=True
