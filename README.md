@@ -7,9 +7,12 @@ SLURM-based HPC systems.
 ## Setup
 
 ```bash
+cd ~/git/ltu-ili && git checkout ltu
 pip install -e ~/git/ltu-ili
 pip install -e .
 ```
+
+**Important:** Use the `ltu` branch of `ltu-ili`.
 
 ## Workflow
 
@@ -17,21 +20,67 @@ pip install -e .
 2. **Edit `ilias/priors.py`** — implement `build_prior()` for your prior
 3. **Edit `conf/config.yaml`** — set `model_dir` and loader kwargs
 
-Then run the pipeline:
+Then run the four-stage pipeline:
+
+### Stage 1: Preprocess
 
 ```bash
-# 1. Preprocess: load data, split train/val/test, init Optuna
 python -m ilias.preprocess model_dir=/path/to/output
+```
 
-# 2. Hyperparameter search (run many in parallel via SLURM)
+Calls your `load_data()` function to load summary statistics (e.g. power
+spectra, bispectra) and their corresponding physical parameters (e.g.
+cosmological parameters). The loaded data is then split into train/validation/test
+sets by simulation ID (so no simulation appears in more than one split,
+preventing data leakage). Optionally applies PCA dimensionality reduction
+to the summaries. Saves the splits as `.npy` arrays and initializes an
+Optuna SQLite study database for the next stage.
+
+### Stage 2: Hyperparameter optimization
+
+```bash
 python -m ilias.optuna model_dir=/path/to/output
+```
 
-# 3. Retrain top nets on full train+val split
+Searches for the best neural density estimator (NDE) architecture and
+training hyperparameters using Optuna. Each trial samples a configuration
+from the hyperprior (defined in `conf/net/*.yaml`) — this includes the
+normalizing flow architecture (e.g. NSF), the number of transforms, hidden
+features, learning rate, batch size, weight decay, and embedding network
+parameters. The trial trains an NDE on the training split, evaluates it by
+computing the mean log-posterior probability on the test split, and records
+the result in the shared SQLite study. Supports optional K-fold
+cross-validation (splitting by simulation ID across folds) for more robust
+evaluation. Multiple SLURM array tasks can run trials in parallel against
+the same study via the `constant_liar` sampler.
+
+### Stage 3: Retrain
+
+```bash
 python -m ilias.train model_dir=/path/to/output retrain=True net_index=0
+```
 
-# 4. Validate ensemble
+After the Optuna search, selects the top-N trial configurations by test
+log-probability and retrains each on the original train+validation split
+(the full non-test data). This is necessary when cross-validation was used
+in Stage 2, since those models were trained on CV folds rather than the
+full training set. Each retrained model is saved as a `posterior.pkl` file
+under `nets/net-{trial_id}/`. Use `net_index` with SLURM arrays to
+parallelize across the top nets.
+
+### Stage 4: Validate
+
+```bash
 python -m ilias.validate model_dir=/path/to/output
 ```
+
+Loads the top-N retrained posteriors and combines them into a softmax-weighted
+ensemble (weighted by test log-probability). Runs diagnostic metrics on the
+test set: plots a single example posterior, computes posterior coverage
+(fraction of true parameters falling within credible intervals), generates
+TARP (Tests of Accuracy with Random Points) calibration curves, and saves
+the ensemble posterior as `posterior.pkl`. Also produces Optuna diagnostic
+plots (optimization history, hyperparameter importance, parameter slices).
 
 ## SLURM
 
