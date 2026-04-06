@@ -5,7 +5,7 @@ Loads an ensemble of trained models, runs posterior coverage diagnostics,
 and optionally cleans up poorly performing models.
 
 Usage:
-    python -m ili_at_scale.validate model_dir=/path/to/output
+    python -m ilias.validate model_dir=/path/to/output
 """
 
 import os

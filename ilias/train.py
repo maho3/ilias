@@ -5,8 +5,8 @@ Supports different inference backends (lampe, sbi), various embedding
 architectures, and retraining from Optuna HP studies.
 
 Usage:
-    python -m ili_at_scale.train model_dir=/path/to/output
-    python -m ili_at_scale.train model_dir=/path/to/output retrain=True
+    python -m ilias.train model_dir=/path/to/output
+    python -m ilias.train model_dir=/path/to/output retrain=True
 """
 
 import os
@@ -245,7 +245,7 @@ def load_preprocessed_data(model_dir):
     except FileNotFoundError:
         raise FileNotFoundError(
             f'Could not find preprocessed data in {model_dir}. '
-            'Run ili_at_scale.preprocess first.'
+            'Run ilias.preprocess first.'
         )
 
     return (x_train, theta_train, ids_train,

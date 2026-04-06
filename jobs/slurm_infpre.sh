@@ -21,7 +21,7 @@ DEVICE="cpu"
 LOADER_ARGS="+loader.data_path=/path/to/data +loader.kmin=0.0 +loader.kmax=0.4"
 
 # ---- RUN ----
-python -m ili_at_scale.preprocess \
+python -m ilias.preprocess \
     model_dir=$MODEL_DIR \
     device=$DEVICE \
     $LOADER_ARGS

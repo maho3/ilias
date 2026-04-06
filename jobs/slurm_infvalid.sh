@@ -18,6 +18,6 @@ MODEL_DIR="/path/to/output/models"
 DEVICE="cpu"
 
 # ---- RUN ----
-python -m ili_at_scale.validate \
+python -m ilias.validate \
     model_dir=$MODEL_DIR \
     device=$DEVICE

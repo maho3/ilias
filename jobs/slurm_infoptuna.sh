@@ -23,7 +23,7 @@ DEVICE="cpu"
 # ---- RUN ----
 # Each array task runs n_trials Optuna trials in parallel via the shared
 # SQLite study. Adjust --array and n_trials to control total search budget.
-python -m ili_at_scale.optuna \
+python -m ilias.optuna \
     model_dir=$MODEL_DIR \
     device=$DEVICE \
     embedding_net=fun \

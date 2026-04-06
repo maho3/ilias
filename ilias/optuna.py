@@ -4,7 +4,7 @@ Hyperparameter optimization via Optuna.
 Supports both standard training and cross-validation strategies.
 
 Usage:
-    python -m ili_at_scale.optuna model_dir=/path/to/output
+    python -m ilias.optuna model_dir=/path/to/output
 """
 
 import os

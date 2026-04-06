@@ -5,7 +5,7 @@ Loads data via the user-defined loader, performs train/val/test splits,
 optionally applies PCA, and initializes an Optuna study.
 
 Usage:
-    python -m ili_at_scale.preprocess model_dir=/path/to/output
+    python -m ilias.preprocess model_dir=/path/to/output
 """
 
 import os

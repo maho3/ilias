@@ -22,7 +22,7 @@ DEVICE="cpu"
 
 # ---- RUN ----
 # Each array task retrains one of the top nets from the Optuna study.
-python -m ili_at_scale.train \
+python -m ilias.train \
     model_dir=$MODEL_DIR \
     device=$DEVICE \
     embedding_net=fun \

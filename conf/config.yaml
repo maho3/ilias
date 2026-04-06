@@ -1,5 +1,5 @@
 # ili-at-scale base configuration
-# Override any key via CLI: python -m ili_at_scale.preprocess model_dir=/my/path
+# Override any key via CLI: python -m ilias.preprocess model_dir=/my/path
 
 # --- OUTPUT ---
 model_dir: ???  # REQUIRED: path to save all outputs (splits, nets, posteriors)
